@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/*
+  Design tokens.
+  In Tailwind v4, anything declared in @theme becomes both a CSS variable
+  and a utility class. Example: --color-ink below gives you `text-ink`, `bg-ink`, `border-ink`.
+*/
+@theme {
+  --font-sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Shared shell colors */
+  --color-ink: #1f2a44;        /* main text, dark surfaces */
+  --color-ink-soft: #4a5571;   /* secondary text */
+  --color-paper: #fafaf7;      /* page background */
+  --color-line: #e3e4df;       /* hairlines and borders */
+
+  /* Per-org palettes (fill = big color areas, deep = text-safe tone, tint = soft backgrounds) */
+  --color-child: #e8a317;
+  --color-child-deep: #7a4f00;
+  --color-child-tint: #fdf3dc;
+
+  --color-senior: #2f7d6d;
+  --color-senior-deep: #1f5a4e;
+  --color-senior-tint: #e3f1ed;
+
+  --color-ability: #5b4bb7;
+  --color-ability-deep: #43358f;
+  --color-ability-tint: #ecebf8;
+
+  /*
+    The "live" accent. Defaults to the childcare palette. Components override these
+    four variables inline on a wrapper element (see accentStyle in orgTypes.js), and every
+    utility inside that wrapper (bg-accent, text-accent-deep, ...) follows the override.
+  */
+  --color-accent: #e8a317;
+  --color-accent-deep: #7a4f00;
+  --color-accent-tint: #fdf3dc;
+  --color-accent-on: #1f2a44;
+}
+
+/* Text-size control: the header sets data-text-size on <html>. Every rem-based size scales with it. */
+html {
+  font-size: 100%;
+}
+html[data-text-size="large"] {
+  font-size: 112.5%;
+}
+html[data-text-size="larger"] {
+  font-size: 125%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth color shifts when the accent changes. Turned off for people who prefer reduced motion. */
+.accent-transition {
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+
+/* A clearly visible keyboard focus ring everywhere */
+:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Blinking caret used by the voice log preview */
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.caret {
+  animation: caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* On the dark footer, the focus ring needs to be light to stay visible */
+footer :focus-visible {
+  outline-color: var(--color-paper);
+}
