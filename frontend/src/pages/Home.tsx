@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { orgTypes, accentStyle } from "../data/orgTypes.ts";
 import VoiceLogPreview from "../components/VoiceLogPreview.tsx";
-import PhotoPlaceholder from "../components/PhotoPlaceholder.tsx";
+import Photo from "../components/Photo.tsx";
+import { photos } from "../data/photos.ts";
 
 const steps = [
   {
@@ -89,7 +90,7 @@ export default function Home() {
       {/* COMMITMENTS: warm, human photo (Papa-inspired) beside what we promise */}
       <section className="border-y border-line bg-white">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-2">
-          <PhotoPlaceholder label="Photo: a caregiver and an older adult laughing over a tablet" />
+          <Photo photo={photos.home} fallbackLabel="Photo: a teacher and young children in a classroom" />
           <div>
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Made for real care settings</h2>
             <dl className="mt-8 space-y-6">

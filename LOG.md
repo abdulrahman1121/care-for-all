@@ -3,7 +3,7 @@
 ## Planned (not implemented yet)
 
 - [x] Convert the frontend to TypeScript (2026-11-22)
-- [ ] Next deliverable (2-hour deadline, childcare only): finish sign-up and sign-in, make Request early access work end to end (trimmed), replace the photo placeholders
+- [ ] Next deliverable (2-hour deadline, childcare only): sign-up and sign-in with Firebase (email and password or Google, organization name in Firestore). Early access was dropped from this deliverable. Photos are done (branch `feat/real-photos`)
 - [x] Merge the Vercel deploy fix and check that refreshing /senior-care works on the live site (2026-11-22)
 - [ ] Pick my "new and unique" tool
 - [ ] Interview the childcare operators I know (questions are in the brainstorm summary)
@@ -15,9 +15,12 @@
 
 ## In Progress
 
-- TypeScript conversion, on `refactor/convert-to-typescript` (built and checked; waiting on the PR)
+- Real photos for the childcare page and the home page, on `feat/real-photos` (built and checked; waiting on my approval to commit)
+- Firebase sign-in (Firestore for the organization name), not started
 
 ## Changelog (done)
+
+- **2026-11-22** — Added real photos to the home page and the childcare page (Unsplash, licence checked, credits shown on the page and in `CREDITS.md`). If a photo fails to load, the placeholder shows instead. I created the photo data file, and the agent finished the rest of my todos so I could focus on Firebase.
 
 - **2026-11-22** — Converted the frontend to TypeScript with strict mode, and type errors now fail the build. I typed three pieces myself: the `OrgType` data types, the check that the `#root` element exists, and the check on the saved text size. The deploy fix is merged and refreshing a sub-page now works on the live site.
 
@@ -36,7 +39,8 @@
 - **Design inspired by brightwheel and Papa**, plus my own touches: colours that follow the chosen care type, a voice-log preview and a text-size control.
 - **TypeScript, strict, and type errors block the build.** I chose all three (2026-11-22). A type error can now stop a deploy, but the old version stays live.
 - **Childcare only for the next deliverable.** Senior care and disability support keep their landing pages but get no new work.
-- **The deliverable has a 2-hour deadline,** so I'm trimming early access and the backend work comes later.
+- **The deliverable has a 2-hour deadline,** so I dropped Request early access from it. Sign-in uses Firebase (email and password or Google) with Firestore for the organization name, and the Spring Boot backend comes later.
+- **Photos from Unsplash.** I picked two, and the agent checked each one's licence page first, because some "free" search results are actually paid Unsplash+ photos.
 - **Vercel for hosting.** Free GitHub accounts can't use Pages on a private repo, and Vercel serves the site from the root.
 - Open: Which unique tool? Offline-first in Phase 1 or later? What the next deliverable has to show, and by when?
 
@@ -48,4 +52,5 @@
 - **GitHub Pages and React Router.** Pages has no server routing, so refreshing `/senior-care` is a 404 unless a fix is added. Vercel needs one small `vercel.json` rewrite for the same reason.
 - **Types are documentation the computer checks.** Deleting one field from the org data, or the check that `#root` exists, now turns into a red error instead of a blank page. A type error also stops `npm run build`, so it can't reach the live site.
 - **Saved values can't be trusted.** localStorage can hold anything, so the text-size setting now checks the saved value and falls back to normal.
+- **"Free" in a search result isn't proof.** Three of the eight "free" Unsplash results were paid Unsplash+ photos. The licence field on each photo's own page is what settles it. And a free licence still doesn't mean the people in the photo agreed to appear in a commercial product.
 - **Pinning dependency versions** (and avoiding brand-new releases) protects against a package update quietly breaking things or carrying malicious code.

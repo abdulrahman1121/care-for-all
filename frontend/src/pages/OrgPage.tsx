@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router";
 import { orgTypes, findOrgType, accentStyle } from "../data/orgTypes.ts";
 import PhotoPlaceholder from "../components/PhotoPlaceholder.tsx";
+import Photo from "../components/Photo.tsx";
 import NotFound from "./NotFound.tsx";
 
 /*
@@ -38,7 +39,11 @@ export default function OrgPage() {
               </a>
             </div>
           </div>
-          <PhotoPlaceholder label={`Photo: ${org.who.toLowerCase()} and staff during a normal day`} />
+          {org.photo ? (
+            <Photo photo={org.photo} fallbackLabel={`Photo: ${org.who.toLowerCase()} and staff during a normal day`} loading="eager" />
+          ) : (
+            <PhotoPlaceholder label={`Photo: ${org.who.toLowerCase()} and staff during a normal day`} />
+          )}
         </div>
       </section>
 
