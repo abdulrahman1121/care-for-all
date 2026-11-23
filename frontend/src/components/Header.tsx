@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
+import { useAuth } from "../auth/AuthContext.tsx";
 import Logo from "./Logo.tsx";
 import TextSizeControl from "./TextSizeControl.tsx";
 import { orgTypes } from "../data/orgTypes.ts";
@@ -23,6 +24,37 @@ function OrgNavLinks({ onNavigate }: { onNavigate?: () => void }) {
   ));
 }
 
+// Signed out: a "Sign in" link. Signed in: the organization name (or email), an Account link and Sign out.
+function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
+  const { status, user, profile, signOut } = useAuth();
+
+  // Reserve the space while Firebase works out who is signed in, so the header doesn't flash "Sign in" then change.
+  if (status === "loading") return <span aria-hidden="true" className="inline-block h-10 w-24" />;
+
+  if (status === "signed-in" && user) {
+    return (
+      <div className="flex items-center gap-3">
+        <Link to="/account" onClick={onNavigate} className="max-w-[14ch] truncate font-bold underline-offset-4 hover:underline">
+          {profile?.orgName ?? user.email ?? "Account"}
+        </Link>
+        <button
+          type="button"
+          onClick={() => void signOut().catch(() => undefined)}
+          className="rounded-full border-2 border-ink px-4 py-2 font-bold"
+        >
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <Link to="/sign-in" onClick={onNavigate} className="rounded-full bg-ink px-5 py-2.5 font-bold text-paper hover:bg-ink/90">
+      Sign in
+    </Link>
+  );
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -41,13 +73,7 @@ export default function Header() {
 
         <div className="hidden items-center gap-3 md:flex">
           <TextSizeControl />
-          <button
-            type="button"
-            className="rounded-full bg-ink px-5 py-2.5 font-bold text-paper hover:bg-ink/90"
-            title="Sign in is coming soon"
-          >
-            Sign in
-          </button>
+          <AuthControls />
         </div>
 
         <button
@@ -68,9 +94,7 @@ export default function Header() {
           </nav>
           <div className="mt-4 flex items-center justify-between">
             <TextSizeControl />
-            <button type="button" className="rounded-full bg-ink px-5 py-2.5 font-bold text-paper">
-              Sign in
-            </button>
+            <AuthControls onNavigate={() => setMenuOpen(false)} />
           </div>
         </div>
       )}
