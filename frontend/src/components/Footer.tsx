@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import Logo from "./Logo.jsx";
-import { orgTypes } from "../data/orgTypes.js";
+import Logo from "./Logo.tsx";
+import { orgTypes } from "../data/orgTypes.ts";
 
 const columns = [
   {

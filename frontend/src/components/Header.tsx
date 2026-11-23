@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
-import Logo from "./Logo.jsx";
-import TextSizeControl from "./TextSizeControl.jsx";
-import { orgTypes } from "../data/orgTypes.js";
+import Logo from "./Logo.tsx";
+import TextSizeControl from "./TextSizeControl.tsx";
+import { orgTypes } from "../data/orgTypes.ts";
 
-function OrgNavLinks({ onNavigate }) {
+function OrgNavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return orgTypes.map((org) => (
     <NavLink
       key={org.slug}

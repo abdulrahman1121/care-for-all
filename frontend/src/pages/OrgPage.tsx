@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router";
-import { orgTypes, findOrgType, accentStyle } from "../data/orgTypes.js";
-import PhotoPlaceholder from "../components/PhotoPlaceholder.jsx";
-import NotFound from "./NotFound.jsx";
+import { orgTypes, findOrgType, accentStyle } from "../data/orgTypes.ts";
+import PhotoPlaceholder from "../components/PhotoPlaceholder.tsx";
+import NotFound from "./NotFound.tsx";
 
 /*
   One template for every care type. useParams() reads ":orgSlug" from the URL,

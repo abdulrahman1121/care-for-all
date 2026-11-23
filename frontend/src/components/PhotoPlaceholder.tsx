@@ -2,7 +2,7 @@
   Stand-in for real photography. Swap this for an <img> once you have
   free-licence photos (or your own) with proper alt text.
 */
-export default function PhotoPlaceholder({ label, className = "" }) {
+export default function PhotoPlaceholder({ label, className = "" }: { label: string; className?: string }) {
   return (
     <div
       role="img"

@@ -2,10 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
-import Layout from "./components/Layout.jsx";
-import Home from "./pages/Home.jsx";
-import OrgPage from "./pages/OrgPage.jsx";
-import NotFound from "./pages/NotFound.jsx";
+import Layout from "./components/Layout.tsx";
+import Home from "./pages/Home.tsx";
+import OrgPage from "./pages/OrgPage.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 /*
   The router maps URLs to pages.
