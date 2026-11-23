@@ -25,7 +25,10 @@ const router = createBrowserRouter([
   },
 ], { basename: import.meta.env.BASE_URL });
 
-createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error('Could not find <div id="root"> in index.html');
+
+createRoot(rootElement).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>
