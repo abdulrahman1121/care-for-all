@@ -25,9 +25,10 @@ Dependency versions are pinned exactly (no `^`), each chosen to be at least two 
 ## Repository
 
 - Layout: `frontend/` holds the React app. A `backend/` folder will hold Spring Boot later. Keep them cleanly separated.
-- Git: initialized at the repo root on `main` (2026-11-15), no commits yet. `.gitignore` is at the root (`node_modules/`, `dist/`, `.env*` except `.env.example`, OS/editor files, logs). See "Next steps" for the agreed first commits.
-- Remote: the owner creates an empty GitHub repo named `care-for-all`; nothing is pushed until he approves. Hosting on GitHub (Pages) is planned, not built: see "Open decisions".
-- Planned branch for current work: `feat/static-home-page`.
+- Git: repo at the root, default branch `main`. `.gitignore` is at the root (`node_modules/`, `dist/`, `.env*` except `.env.example`, OS/editor files, logs). Merge pull requests into `main` with **squash** (PR #1 landed as one squash commit).
+- Remote: `https://github.com/abdulrahman1121/care-for-all`. The repo is **public for now**; the owner plans to make it private in a few weeks (see Decisions log for the email caveat).
+- Hosting: Vercel, see "Hosting and deploys" below.
+- Current branch for the deploy fix: `feat/vercel-deploy` (see the progress log).
 
 ## Current state
 
@@ -36,6 +37,14 @@ Two static pages are built and verified (production build passes; desktop and mo
 - **Home (`/`)**: sticky header with nav to the three care types, a text-size control (A / A+ / A++), and a "Sign in" placeholder. The hero asks "Who do you care for?" with three choices; hovering or focusing one shifts the page accent colour to that org. A voice-log preview card types out a sample spoken note and turns it into structured entries. Then a 3-step "how it works", a "made for real care settings" section with a photo placeholder, a closing call to action, and a multi-column footer.
 - **Org landing template (`/:orgSlug`)**: one component serves `/childcare`, `/senior-care` and `/disability-support`, reading content and colours from `frontend/src/data/orgTypes.js`. Sections: hero, three tailored features, a sample-day timeline, links to the other care types.
 - **Catch-all (`*`)**: "This page isn't built yet" page, used by footer links (About, Contact, Privacy, Accessibility, Security).
+
+### Hosting and deploys
+
+- **Live site:** https://frontend-pink-eight-29.vercel.app (Vercel, free Hobby plan; the site is served from the root, no sub-path). The live JS bundle matches a build of `main`, so it was deployed from this repo's code. **Unconfirmed:** that the Vercel project is connected to the GitHub repo so every push auto-deploys, and its Root Directory setting. The first merge to `main` after this change will show whether it redeploys by itself.
+- GitHub Pages and a GitHub Actions workflow were considered and dropped (see Decisions log).
+- **Deep links:** React Router needs every path to serve `index.html`. `frontend/vercel.json` holds Vercel's documented rewrite (`/(.*)` to `/index.html`). Before that file is merged and deployed, refreshing `/senior-care` (or any sub-page) returns a 404, as checked on 2026-11-22. **After it deploys, re-check that a refresh on `/senior-care` returns the page.** Not yet verified, because the rewrite cannot be run locally without a Vercel login.
+- `frontend/src/main.jsx` passes `basename: import.meta.env.BASE_URL` to the router. At the root this is just `/`, so it changes nothing today, but the base path is configurable in one place (Vite's `base`). This line was a human todo typed by the owner.
+- Not verified on the live site: how it renders in a browser (checked with HTTP requests only), mobile, keyboard use, whether the font loads.
 
 ### Key files
 
@@ -59,19 +68,18 @@ Sign in, Request early access (buttons do nothing), photo placeholders, footer i
 
 ## Next steps
 
-1. **Confirm open decisions with the owner** (see below) before building further.
-2. **Initialize git** at the repo root, then propose two commits for the owner to approve:
-   - On `main`: `chore: scaffold Vite + React + Tailwind frontend` (package files, Vite config, `index.html`, `.gitignore`, `README.md`, `CLAUDE.md`, `LOG.md`).
-   - On `feat/static-home-page`: `feat: add home page, org landing template, header and footer` (everything in `frontend/src/`).
-   Ask the owner whether to merge by GitHub pull request or local merge.
-3. Have the owner run `npm install && npm run dev` in `frontend/` and check both pages, including the hover colour shift, text-size control and mobile menu.
-4. Then: interviews with childcare operators, followed by the org-type architecture decision and Phase 1 planning.
+1. **Finish the deploy fix** (`feat/vercel-deploy`): push the branch, check Vercel's preview, squash-merge the PR, then confirm a refresh on `/senior-care` works on the live site.
+2. **Convert the frontend to TypeScript** (owner chose TypeScript on 2026-11-22; the plan is waiting for his final confirmation). One branch, e.g. `refactor/convert-to-typescript`.
+3. **Next deliverable focuses on childcare only** (owner's call, 2026-11-22). Senior care and disability support keep their landing pages but get no new work. Still to confirm with the owner: what the deliverable has to show and the deadline. The childcare Phase 1 pieces are in `LOG.md`; the backend (Spring Boot) work comes with it.
+4. Interviews with childcare operators, then the org-type architecture decision.
+5. Create the `architecture/` folder once there is enough backend work to diagram (owner's call, 2026-11-22).
 
 ## Open decisions (owner decides; present options neutrally first)
 
-- **JavaScript vs TypeScript.** The pages were written in plain JavaScript (JSX) without asking. Raise this explicitly; converting now is cheap.
+- **TypeScript conversion details.** The owner chose TypeScript (2026-11-22). The pages are still plain JavaScript (JSX). Waiting on his final confirmation of the plan (strictness level, whether type errors may fail a Vercel deploy) before converting.
 - **"New and unique" tool** from the candidate list above.
-- **GitHub Pages hosting details.** The owner wants to host on GitHub. A Pages site lives under `/care-for-all/` and has no server-side routing, so a deep link like `/senior-care` would 404 on refresh unless we add a fix (options: a `404.html` redirect trick, hash routing, or a custom domain at the root). Lay out the options neutrally before building. Also decide deploy method (GitHub Actions vs manual) and how the later Spring Boot backend is hosted, since Pages is static only.
+- **Backend hosting.** Vercel serves the static frontend. How the Spring Boot backend is hosted (AWS is the plan) is not decided.
+- **Vercel free plan fit.** Whether the Hobby plan's terms allow a commercial product was not confirmed (Vercel's docs I could read did not say). Read the Terms of Service before any commercial launch. Hobby deploys may also block commits from anyone who is not the Hobby team owner; test this when the peer starts pushing.
 - **Offline-first in Phase 1** or later (open comment in the brainstorm summary doc).
 - **Org-type architecture:** separate apps, one shared app with a type setting, or a shared core with pluggable modules.
 
@@ -85,12 +93,20 @@ Sign in, Request early access (buttons do nothing), photo placeholders, footer i
 | 2026-11-15 | Tailwind CSS 4 | Fast styling with central design tokens; suits per-org accent colours |
 | 2026-11-15 | Design: brightwheel + Papa inspiration, "three doors" with shifting accent, voice preview, text-size control, Atkinson Hyperlegible | Warmth plus accessibility for all three audiences |
 | 2026-11-15 | Product name is **CareForAll** (replaces the working name "Carelog"); GitHub repo is `care-for-all` | Owner's call. The package name `care-app-frontend` was left unchanged for now |
+| 2026-11-15 | Router `basename` read from Vite's `BASE_URL`, typed by the owner as a human todo | Keeps the base path in one place. Needed for GitHub Pages, harmless on Vercel |
+| 2026-11-15 | Host on **Vercel** (replaces GitHub Pages, and the GitHub Actions and manual `gh-pages` options) | Owner chose it after Pages turned out to need a public repo on a free GitHub account (checked in GitHub's plans page). Vercel's docs: free plan deploys private repos from a personal account, serves from the root (no `/care-for-all/` prefix), deploys every push and gives each PR a preview URL, and fixes refresh on sub-pages with one `vercel.json` rewrite. Costs: commercial-use terms for the free plan unconfirmed; Hobby may block commits from non-owners; the Vercel GitHub app asks for broad permissions (limit it to this repo); no CI of our own yet |
+| 2026-11-22 | Keep the commit author email as is, and make the repo private in a few weeks | Owner's call. The first commit (`f44ac1c`) shows his real email, readable by anyone while the repo is public. Going private later does not remove copies or cached views. The squash-merge commit already uses GitHub's noreply address |
+| 2026-11-22 | Use **TypeScript** for the frontend (conversion pending his confirmation of the plan) | Owner's call |
+| 2026-11-22 | The next deliverable focuses on **childcare** only | Owner's call. Senior care and disability support pages stay as they are |
+| 2026-11-22 | Defer the `architecture/` folder until there is enough backend work (exception to the global rule, at the owner's request) | Owner's call. Today the app is a static frontend with no backend or stored data to diagram |
 
 ## Progress log
 
 - 2026-11-15 — Brainstorm, competitor research, feature selection, roadmap draft.
 - 2026-11-15 — Static home page and org landing template built; production build passes; screenshots reviewed. Fixed a bug where per-org colours didn't apply (CSS variables referenced via `var()` inside `@theme` resolve at `:root`, so overrides now set `--color-accent*` directly).
 - 2026-11-15 — Code moved into `~/Desktop/CareForAll` and re-verified: `npm ci` (0 vulnerabilities), production build, `/`, `/senior-care` and `/about` render, hover colour shift and text-size control work, no console errors. Renamed the product from "Carelog" to CareForAll in code and docs (header, footer, title, aria-label, copy); mobile header still fits at 375px with no horizontal scroll. Added `.gitignore` and ran `git init -b main`. Not verified: mobile menu, keyboard use, font loading.
+- 2026-11-15 — Committed the scaffold on `main` and the home page on `feat/static-home-page`; the owner pushed, opened PR #1 and squash-merged it. Looked at GitHub Pages: it needs a public repo on a free plan, serves under `/care-for-all/`, and has no server routing. The owner typed the router `basename` line himself (a human todo, tested first in a scratch copy). Then he deployed to Vercel (the live bundle matches a build of `main`). Live site checked by HTTP: home page 200 with the right title, sub-pages 404 on refresh because `vercel.json` was not deployed yet. Wrote `frontend/vercel.json` and removed the `/care-for-all/` base on `feat/vercel-deploy`.
+- 2026-11-22 — Catch-up: nothing new on GitHub since PR #1; repo is public; live site unchanged (sub-pages still 404). Owner decisions: TypeScript, childcare focus for the next deliverable, keep the commit email, architecture folder later. Committed the deploy fix (`main.jsx` basename line was the owner's todo). Not verified: the rewrite on a real deploy, the live site in a browser.
 
 ## Working agreement (the owner's mentor rules)
 
