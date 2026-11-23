@@ -4,6 +4,7 @@
   not editing every component. (This is the "data-driven UI" idea: the data decides what renders.)
 */
 import type { CSSProperties } from "react";
+import { photos, type OrgPhoto } from "./photos.ts";
 
 export interface OrgColors {
   accent: string;
@@ -24,11 +25,13 @@ export interface OrgType {
   sampleEntries: { label: string; value: string }[];
   features: { title: string; body: string }[];
   day: { time: string; text: string }[];
+  photo?: OrgPhoto;
 }
 
 export const orgTypes: OrgType[] = [
   {
     slug: "childcare",
+    photo: photos.childcare,
     name: "Childcare",
     who: "Children",
     tagline: "For daycares, preschools and home childcare",
