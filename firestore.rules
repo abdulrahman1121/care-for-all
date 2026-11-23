@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // One profile per signed-in person, readable and writable only by that person.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['orgName', 'updatedAt'])
+        && request.resource.data.orgName is string
+        && request.resource.data.orgName.size() > 0
+        && request.resource.data.orgName.size() <= 80
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+    }
+
+    // Everything else is denied by default.
+  }
+}
