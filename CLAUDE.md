@@ -14,7 +14,7 @@ CareForAll is a web app for care organizations to replace manual, paper-based lo
 
 | Layer | Choice | Status |
 | --- | --- | --- |
-| Frontend | React 19 + Vite 8 + React Router 8 (SPA) | In use |
+| Frontend | React 19 + TypeScript 7 + Vite 8 + React Router 8 (SPA) | In use |
 | Styling | Tailwind CSS 4 (tokens in `frontend/src/index.css`) | In use |
 | Backend | Java Spring Boot | Not started |
 | Cloud | AWS | Not started |
@@ -35,24 +35,25 @@ Dependency versions are pinned exactly (no `^`), each chosen to be at least two 
 Two static pages are built and verified (production build passes; desktop and mobile screenshots reviewed):
 
 - **Home (`/`)**: sticky header with nav to the three care types, a text-size control (A / A+ / A++), and a "Sign in" placeholder. The hero asks "Who do you care for?" with three choices; hovering or focusing one shifts the page accent colour to that org. A voice-log preview card types out a sample spoken note and turns it into structured entries. Then a 3-step "how it works", a "made for real care settings" section with a photo placeholder, a closing call to action, and a multi-column footer.
-- **Org landing template (`/:orgSlug`)**: one component serves `/childcare`, `/senior-care` and `/disability-support`, reading content and colours from `frontend/src/data/orgTypes.js`. Sections: hero, three tailored features, a sample-day timeline, links to the other care types.
+- **Org landing template (`/:orgSlug`)**: one component serves `/childcare`, `/senior-care` and `/disability-support`, reading content and colours from `frontend/src/data/orgTypes.ts`. Sections: hero, three tailored features, a sample-day timeline, links to the other care types.
 - **Catch-all (`*`)**: "This page isn't built yet" page, used by footer links (About, Contact, Privacy, Accessibility, Security).
 
 ### Hosting and deploys
 
-- **Live site:** https://frontend-pink-eight-29.vercel.app (Vercel, free Hobby plan; the site is served from the root, no sub-path). The live JS bundle matches a build of `main`, so it was deployed from this repo's code. **Unconfirmed:** that the Vercel project is connected to the GitHub repo so every push auto-deploys, and its Root Directory setting. The first merge to `main` after this change will show whether it redeploys by itself.
+- **Live site:** https://frontend-pink-eight-29.vercel.app (Vercel, free Hobby plan; served from the root, no sub-path). The Vercel project is connected to this GitHub repo: pushing or merging to `main` redeploys it (the owner confirmed it on the project page, and the live bundle changed right after PR #2 merged on 2026-11-22). Vercel runs `npm run build`, which now includes the type check, so a type error blocks a deploy.
 - GitHub Pages and a GitHub Actions workflow were considered and dropped (see Decisions log).
-- **Deep links:** React Router needs every path to serve `index.html`. `frontend/vercel.json` holds Vercel's documented rewrite (`/(.*)` to `/index.html`). Before that file is merged and deployed, refreshing `/senior-care` (or any sub-page) returns a 404, as checked on 2026-11-22. **After it deploys, re-check that a refresh on `/senior-care` returns the page.** Not yet verified, because the rewrite cannot be run locally without a Vercel login.
-- `frontend/src/main.jsx` passes `basename: import.meta.env.BASE_URL` to the router. At the root this is just `/`, so it changes nothing today, but the base path is configurable in one place (Vite's `base`). This line was a human todo typed by the owner.
+- **Deep links:** React Router needs every path to serve `index.html`, so `frontend/vercel.json` holds Vercel's documented rewrite (`/(.*)` to `/index.html`). **Verified live on 2026-11-22 after PR #2:** `/senior-care`, `/childcare`, `/disability-support` and `/about` all return 200 with the app. Side effect: a missing file such as `/assets/nope.js` also returns the HTML page with a 200, because the rewrite catches everything.
+- `frontend/src/main.tsx` passes `basename: import.meta.env.BASE_URL` to the router. At the root this is just `/`, so it changes nothing today, but the base path is configurable in one place (Vite's `base`). This line was a human todo typed by the owner.
 - Not verified on the live site: how it renders in a browser (checked with HTTP requests only), mobile, keyboard use, whether the font loads.
 
 ### Key files
 
-- `frontend/src/main.jsx` — router setup (layout route + child routes).
-- `frontend/src/data/orgTypes.js` — all org-type content and colours; `accentStyle(org)` returns the CSS variables that recolour a section.
+- `frontend/src/main.tsx` — router setup (layout route + child routes) and the `#root` guard.
+- `frontend/src/data/orgTypes.ts` — the `OrgType` interface plus all org-type content and colours; `accentStyle(org)` returns the CSS variables that recolour a section.
 - `frontend/src/index.css` — Tailwind import, design tokens (`@theme`), text-size scaling, focus ring, reduced-motion rules.
 - `frontend/src/components/` — `Layout`, `Header`, `Footer`, `Logo`, `TextSizeControl`, `VoiceLogPreview`, `PhotoPlaceholder`.
 - `frontend/src/pages/` — `Home`, `OrgPage`, `NotFound`.
+- TypeScript: `frontend/tsconfig.json` points at `tsconfig.app.json` (the app, `strict: true`) and `tsconfig.node.json` (`vite.config.ts`). `npm run typecheck` runs `tsc -b`; `npm run build` runs `tsc -b && vite build`, so type errors fail the build. Imports keep their `.tsx`/`.ts` extensions, as in Vite's own template.
 
 ### Design system
 
@@ -68,15 +69,14 @@ Sign in, Request early access (buttons do nothing), photo placeholders, footer i
 
 ## Next steps
 
-1. **Finish the deploy fix** (`feat/vercel-deploy`): push the branch, check Vercel's preview, squash-merge the PR, then confirm a refresh on `/senior-care` works on the live site.
-2. **Convert the frontend to TypeScript** (owner chose TypeScript on 2026-11-22; the plan is waiting for his final confirmation). One branch, e.g. `refactor/convert-to-typescript`.
-3. **Next deliverable focuses on childcare only** (owner's call, 2026-11-22). Senior care and disability support keep their landing pages but get no new work. Still to confirm with the owner: what the deliverable has to show and the deadline. The childcare Phase 1 pieces are in `LOG.md`; the backend (Spring Boot) work comes with it.
+1. ~~Finish the deploy fix~~ Done 2026-11-22 (PR #2 merged, deep links verified live).
+2. ~~Convert the frontend to TypeScript~~ Done on `refactor/convert-to-typescript` (see the progress log for the PR state).
+3. **Next deliverable (childcare only; the owner said the deadline is 2 hours, on 2026-11-22):** (a) a complete sign-up and sign-in flow, (b) Request early access working end to end (the owner wants to trim this to fit the deadline; the exact scope is still to confirm), (c) real photos in place of the placeholders. Each needs its options laid out neutrally first: how accounts and sign-in work, where early-access requests are stored and who is notified, and where photos come from (licensing). Senior care and disability support keep their landing pages but get no new work.
 4. Interviews with childcare operators, then the org-type architecture decision.
 5. Create the `architecture/` folder once there is enough backend work to diagram (owner's call, 2026-11-22).
 
 ## Open decisions (owner decides; present options neutrally first)
 
-- **TypeScript conversion details.** The owner chose TypeScript (2026-11-22). The pages are still plain JavaScript (JSX). Waiting on his final confirmation of the plan (strictness level, whether type errors may fail a Vercel deploy) before converting.
 - **"New and unique" tool** from the candidate list above.
 - **Backend hosting.** Vercel serves the static frontend. How the Spring Boot backend is hosted (AWS is the plan) is not decided.
 - **Vercel free plan fit.** Whether the Hobby plan's terms allow a commercial product was not confirmed (Vercel's docs I could read did not say). Read the Terms of Service before any commercial launch. Hobby deploys may also block commits from anyone who is not the Hobby team owner; test this when the peer starts pushing.
@@ -96,7 +96,9 @@ Sign in, Request early access (buttons do nothing), photo placeholders, footer i
 | 2026-11-15 | Router `basename` read from Vite's `BASE_URL`, typed by the owner as a human todo | Keeps the base path in one place. Needed for GitHub Pages, harmless on Vercel |
 | 2026-11-15 | Host on **Vercel** (replaces GitHub Pages, and the GitHub Actions and manual `gh-pages` options) | Owner chose it after Pages turned out to need a public repo on a free GitHub account (checked in GitHub's plans page). Vercel's docs: free plan deploys private repos from a personal account, serves from the root (no `/care-for-all/` prefix), deploys every push and gives each PR a preview URL, and fixes refresh on sub-pages with one `vercel.json` rewrite. Costs: commercial-use terms for the free plan unconfirmed; Hobby may block commits from non-owners; the Vercel GitHub app asks for broad permissions (limit it to this repo); no CI of our own yet |
 | 2026-11-22 | Keep the commit author email as is, and make the repo private in a few weeks | Owner's call. The first commit (`f44ac1c`) shows his real email, readable by anyone while the repo is public. Going private later does not remove copies or cached views. The squash-merge commit already uses GitHub's noreply address |
-| 2026-11-22 | Use **TypeScript** for the frontend (conversion pending his confirmation of the plan) | Owner's call |
+| 2026-11-22 | Use **TypeScript** (7.0.2, with `@types/react` and `@types/react-dom` 19.3.0 and `@types/node` 24.19.2, all pinned exactly and over two weeks old) | Owner's call. The app is small (about 840 lines), so converting now is cheap, and typed data catches misspelled or missing fields before they ship. Costs: more to learn, and type errors are now build errors |
+| 2026-11-22 | Turn on `strict` mode, and make type errors fail `npm run build` (so they block a Vercel deploy) | Owner chose both options. Strict catches missing-value mistakes (TypeScript 7 enables it by default, which was tested; the tsconfig also sets it explicitly). Verified: a type error stops the build before Vite runs and no `dist` folder is made. Cost: a type error on `main` blocks a quick fix from deploying; the previous deploy stays live and Vercel can roll back |
+| 2026-11-22 | The next deliverable is three things, childcare only: complete sign-up and sign-in, Request early access end to end (to be trimmed), real photos. Deadline: 2 hours | Owner's call. The short deadline means the Spring Boot backend, AWS and the other roadmap items stay out of this deliverable unless the owner decides otherwise after seeing the options |
 | 2026-11-22 | The next deliverable focuses on **childcare** only | Owner's call. Senior care and disability support pages stay as they are |
 | 2026-11-22 | Defer the `architecture/` folder until there is enough backend work (exception to the global rule, at the owner's request) | Owner's call. Today the app is a static frontend with no backend or stored data to diagram |
 
@@ -107,6 +109,7 @@ Sign in, Request early access (buttons do nothing), photo placeholders, footer i
 - 2026-11-15 — Code moved into `~/Desktop/CareForAll` and re-verified: `npm ci` (0 vulnerabilities), production build, `/`, `/senior-care` and `/about` render, hover colour shift and text-size control work, no console errors. Renamed the product from "Carelog" to CareForAll in code and docs (header, footer, title, aria-label, copy); mobile header still fits at 375px with no horizontal scroll. Added `.gitignore` and ran `git init -b main`. Not verified: mobile menu, keyboard use, font loading.
 - 2026-11-15 — Committed the scaffold on `main` and the home page on `feat/static-home-page`; the owner pushed, opened PR #1 and squash-merged it. Looked at GitHub Pages: it needs a public repo on a free plan, serves under `/care-for-all/`, and has no server routing. The owner typed the router `basename` line himself (a human todo, tested first in a scratch copy). Then he deployed to Vercel (the live bundle matches a build of `main`). Live site checked by HTTP: home page 200 with the right title, sub-pages 404 on refresh because `vercel.json` was not deployed yet. Wrote `frontend/vercel.json` and removed the `/care-for-all/` base on `feat/vercel-deploy`.
 - 2026-11-22 — Catch-up: nothing new on GitHub since PR #1; repo is public; live site unchanged (sub-pages still 404). Owner decisions: TypeScript, childcare focus for the next deliverable, keep the commit email, architecture folder later. Committed the deploy fix (`main.jsx` basename line was the owner's todo). Not verified: the rewrite on a real deploy, the live site in a browser.
+- 2026-11-22 — Merged the deploy fix (PR #2) and confirmed on the live site that sub-pages now load on refresh. Converted the frontend to TypeScript on `refactor/convert-to-typescript`: pinned dependencies, tsconfig files, renamed files with `git mv`, typed props. Everything was proven in a scratch copy first. **Human todos typed by the owner:** the `OrgType` interface and typed helpers in `orgTypes.ts`, the `#root` null guard in `main.tsx`, and the localStorage validation in `TextSizeControl.tsx`. Reviewed against the tested versions: identical apart from whitespace (one double space fixed). Verified: `npx tsc -b` exits 0, `npm run build` passes, a missing data field and a missing `#root` guard each fail the type check, a type error blocks the build and creates no `dist`, six storage cases for the text size pass, and in a browser a junk stored text size falls back to normal, A++ persists across a reload, the hover colour shift works, an unknown URL shows the not-built page, and the console is clean. Not verified: mobile, keyboard use, font loading.
 
 ## Working agreement (the owner's mentor rules)
 

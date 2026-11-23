@@ -3,8 +3,30 @@
   Both pages read from this list, so adding a fourth org type later means adding one object here,
   not editing every component. (This is the "data-driven UI" idea: the data decides what renders.)
 */
+import type { CSSProperties } from "react";
 
-export const orgTypes = [
+export interface OrgColors {
+  accent: string;
+  deep: string;
+  tint: string;
+  on: string;
+}
+
+export interface OrgType {
+  slug: string;
+  name: string;
+  who: string;
+  tagline: string;
+  headline: string;
+  intro: string;
+  colors: OrgColors;
+  sampleNote: string;
+  sampleEntries: { label: string; value: string }[];
+  features: { title: string; body: string }[];
+  day: { time: string; text: string }[];
+}
+
+export const orgTypes: OrgType[] = [
   {
     slug: "childcare",
     name: "Childcare",
@@ -115,7 +137,8 @@ export const orgTypes = [
   },
 ];
 
-export function findOrgType(slug) {
+// slug is string | undefined because useParams() can't promise the URL has one.
+export function findOrgType(slug: string | undefined): OrgType | undefined {
   return orgTypes.find((org) => org.slug === slug);
 }
 
@@ -123,7 +146,11 @@ export function findOrgType(slug) {
   Turns an org's colors into the CSS variables that the "accent" utilities read.
   Put the result in a wrapper's style={...} and everything inside takes that org's colors.
 */
-export function accentStyle(org) {
+
+// CSSProperties alone rejects custom "--..." names, so we also allow any key that starts with "--".
+type CssVars = CSSProperties & Record<`--${string}`, string>;
+
+export function accentStyle(org: OrgType): CssVars {
   return {
     "--color-accent": org.colors.accent,
     "--color-accent-deep": org.colors.deep,

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { orgTypes, accentStyle } from "../data/orgTypes.js";
-import VoiceLogPreview from "../components/VoiceLogPreview.jsx";
-import PhotoPlaceholder from "../components/PhotoPlaceholder.jsx";
+import { orgTypes, accentStyle } from "../data/orgTypes.ts";
+import VoiceLogPreview from "../components/VoiceLogPreview.tsx";
+import PhotoPlaceholder from "../components/PhotoPlaceholder.tsx";
 
 const steps = [
   {

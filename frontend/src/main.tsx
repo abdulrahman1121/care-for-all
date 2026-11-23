@@ -2,10 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
-import Layout from "./components/Layout.jsx";
-import Home from "./pages/Home.jsx";
-import OrgPage from "./pages/OrgPage.jsx";
-import NotFound from "./pages/NotFound.jsx";
+import Layout from "./components/Layout.tsx";
+import Home from "./pages/Home.tsx";
+import OrgPage from "./pages/OrgPage.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 /*
   The router maps URLs to pages.
@@ -25,7 +25,10 @@ const router = createBrowserRouter([
   },
 ], { basename: import.meta.env.BASE_URL });
 
-createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error('Could not find <div id="root"> in index.html');
+
+createRoot(rootElement).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>

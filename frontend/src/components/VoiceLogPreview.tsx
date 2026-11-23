@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { OrgType } from "../data/orgTypes.ts";
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -12,7 +13,7 @@ function prefersReducedMotion() {
   every 35ms until the whole note shows, then the entries appear.
   When the org changes, the effect restarts with the new note.
 */
-export default function VoiceLogPreview({ org }) {
+export default function VoiceLogPreview({ org }: { org: OrgType }) {
   const note = org.sampleNote;
   const [typed, setTyped] = useState(0);
 

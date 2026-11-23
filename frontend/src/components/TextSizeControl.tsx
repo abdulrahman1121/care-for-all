@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
-const sizes = [
+type TextSize = "normal" | "large" | "larger";
+
+const sizes: { id: TextSize; label: string; name: string }[] = [
   { id: "normal", label: "A", name: "Normal text" },
   { id: "large", label: "A+", name: "Large text" },
   { id: "larger", label: "A++", name: "Larger text" },
@@ -8,9 +10,15 @@ const sizes = [
 
 const STORAGE_KEY = "text-size";
 
-function readSaved() {
+// localStorage can hold anything (old versions, hand edits), so check before trusting it.
+function isTextSize(value: string | null): value is TextSize {
+  return sizes.some((s) => s.id === value);
+}
+
+function readSaved(): TextSize {
   try {
-    return localStorage.getItem(STORAGE_KEY) || "normal";
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return isTextSize(saved) ? saved : "normal";
   } catch {
     return "normal";
   }
