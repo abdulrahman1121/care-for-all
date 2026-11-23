@@ -6,6 +6,10 @@ import Layout from "./components/Layout.tsx";
 import Home from "./pages/Home.tsx";
 import OrgPage from "./pages/OrgPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import SignIn from "./pages/SignIn.tsx";
+import SignUp from "./pages/SignUp.tsx";
+import Account from "./pages/Account.tsx";
+import { AuthProvider } from "./auth/AuthContext.tsx";
 
 /*
   The router maps URLs to pages.
@@ -19,6 +23,9 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "/", element: <Home /> },
+      { path: "/sign-in", element: <SignIn /> },
+      { path: "/sign-up", element: <SignUp /> },
+      { path: "/account", element: <Account /> },
       { path: "/:orgSlug", element: <OrgPage /> },
       { path: "*", element: <NotFound /> },
     ],
@@ -30,6 +37,8 @@ if (!rootElement) throw new Error('Could not find <div id="root"> in index.html'
 
 createRoot(rootElement).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );

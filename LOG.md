@@ -3,7 +3,7 @@
 ## Planned (not implemented yet)
 
 - [x] Convert the frontend to TypeScript (2026-11-22)
-- [ ] Next deliverable (2-hour deadline, childcare only): sign-up and sign-in with Firebase (email and password or Google, organization name in Firestore). Early access was dropped from this deliverable. Photos are done (branch `feat/real-photos`)
+- [ ] Finish the sign-in deliverable: publish the Firestore rules, set the Firebase variables on Vercel, authorize the Vercel domain, then test email and Google sign-in on the real project (early access was dropped; photos are done)
 - [x] Merge the Vercel deploy fix and check that refreshing /senior-care works on the live site (2026-11-22)
 - [ ] Pick my "new and unique" tool
 - [ ] Interview the childcare operators I know (questions are in the brainstorm summary)
@@ -16,9 +16,11 @@
 ## In Progress
 
 - Real photos for the childcare page and the home page, on `feat/real-photos` (built and checked; waiting on my approval to commit)
-- Firebase sign-in (Firestore for the organization name), not started
+- Firebase sign-in with email and password or Google, and the organization name in Firestore, on `feat/firebase-auth` (built and tested against the emulators; waiting on my approval to commit)
 
 ## Changelog (done)
+
+- **2026-11-22** — Built sign-in, sign-up and an account page with Firebase (email and password, or Google), with the organization name stored in Firestore. I typed the security rules and the friendly error messages myself. It was tested against Firebase's local emulators, not my real project: the Google sign-in round trip and the real project still need a manual test.
 
 - **2026-11-22** — Added real photos to the home page and the childcare page (Unsplash, licence checked, credits shown on the page and in `CREDITS.md`). If a photo fails to load, the placeholder shows instead. I created the photo data file, and the agent finished the rest of my todos so I could focus on Firebase.
 
@@ -53,4 +55,7 @@
 - **Types are documentation the computer checks.** Deleting one field from the org data, or the check that `#root` exists, now turns into a red error instead of a blank page. A type error also stops `npm run build`, so it can't reach the live site.
 - **Saved values can't be trusted.** localStorage can hold anything, so the text-size setting now checks the saved value and falls back to normal.
 - **"Free" in a search result isn't proof.** Three of the eight "free" Unsplash results were paid Unsplash+ photos. The licence field on each photo's own page is what settles it. And a free licence still doesn't mean the people in the photo agreed to appear in a commercial product.
+- **Security rules are the real lock.** Anyone can open the browser tools and send their own requests, so the Firestore rules decide who can read or write, not the app's code. I tested mine with 16 allow-and-deny cases before publishing.
+- **A test only proves something about what it ran against.** The emulator can't complete a Google popup in this browser, so Google sign-in is still unverified, and nothing was tested against my real Firebase project yet.
+- **Plan for the half-finished case.** A person can be signed in without a saved organization name (Google, or a failed save), so the account page handles "no name yet" as a normal state.
 - **Pinning dependency versions** (and avoiding brand-new releases) protects against a package update quietly breaking things or carrying malicious code.
